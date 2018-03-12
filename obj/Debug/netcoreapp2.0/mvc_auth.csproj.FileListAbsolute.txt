@@ -9,4 +9,3 @@
 /home/vlad/MEGA/Projects/dotnet/mvc_auth/obj/Debug/netcoreapp2.0/mvc_auth.AssemblyInfo.cs
 /home/vlad/MEGA/Projects/dotnet/mvc_auth/obj/Debug/netcoreapp2.0/mvc_auth.dll
 /home/vlad/MEGA/Projects/dotnet/mvc_auth/obj/Debug/netcoreapp2.0/mvc_auth.pdb
-/home/vlad/MEGA/Projects/dotnet/mvc_auth/bin/Debug/netcoreapp2.0/app.db

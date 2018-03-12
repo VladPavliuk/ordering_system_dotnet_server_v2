@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
-using Reservation.Models;
+using mvc_auth.Models;
+using mvc_auth.Data;
 using System;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -14,11 +15,13 @@ namespace Reservation.Controllers
     [Route("api/[controller]")]
     public class OrganizationsController : Controller
     {
-        private readonly ReservationDbContext dbContext;
+        private readonly ApplicationDbContext dbContext;
 
-        public OrganizationsController()
+        public OrganizationsController(
+            ApplicationDbContext dbContext
+        )
         {
-            this.dbContext = new ReservationDbContext();
+            this.dbContext = dbContext;
         }
 
         [HttpPost("pin-service/{organizationId}/{serviceId}")]
@@ -112,7 +115,7 @@ namespace Reservation.Controllers
             Organization organization = new Organization();
             organization.User_ID = user;
             organization.Title = data["title"].ToString();
-            organization.Schedule = data["schedule"].ToString();
+            // organization.Schedule = data["schedule"].ToString();
 
             dbContext.Organization.Add(organization);
             dbContext.SaveChanges();
@@ -120,7 +123,7 @@ namespace Reservation.Controllers
             return Ok();
         }
 
-        [HttpPost("set-avatar/{id}")]
+        [HttpPost("{id}/set-avatar")]
         public IActionResult SetAvatar(long id, IFormFile Image)
         {
             Organization organization = dbContext.Organization.FirstOrDefault(t => t.ID == (int) id);

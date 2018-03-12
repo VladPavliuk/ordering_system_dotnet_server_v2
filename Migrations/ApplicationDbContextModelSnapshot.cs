@@ -246,8 +246,6 @@ namespace mvc_auth.Migrations
 
                     b.Property<string>("ImagePath");
 
-                    b.Property<string>("Schedule");
-
                     b.Property<string>("Title")
                         .IsRequired();
 
