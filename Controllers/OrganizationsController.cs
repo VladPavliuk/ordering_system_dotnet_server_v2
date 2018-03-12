@@ -75,7 +75,7 @@ namespace Reservation.Controllers
 
             return dbContext.Service
                 .Where(t => !dbContext.OrganizationServiceRelation
-                    .Any(b => t.ID == b.Service_ID.ID && organization == b.Organization_ID))
+                .Any(b => t.ID == b.Service_ID.ID && organization == b.Organization_ID))
                 .ToList();
         }
 
@@ -115,12 +115,65 @@ namespace Reservation.Controllers
             Organization organization = new Organization();
             organization.User_ID = user;
             organization.Title = data["title"].ToString();
-            // organization.Schedule = data["schedule"].ToString();
-
+            
             dbContext.Organization.Add(organization);
             dbContext.SaveChanges();
 
             return Ok();
+        }
+
+        [HttpPost("{id}/set-schedule")]
+        public IActionResult setSchedule(long id, [FromBody]JObject data)
+        {
+            DateTime from = DateTime.Parse(data["from"].ToObject<String>());
+            DateTime to = DateTime.Parse(data["to"].ToObject<String>());
+            Date dateToSet = dbContext.Date.FirstOrDefault(t => t.Title == data["date"].ToObject<string>());
+            Organization organization = dbContext.Organization.FirstOrDefault(t => t.ID == id);
+
+            if(dateToSet == null || organization == null) {
+                 return BadRequest();
+            } 
+
+             dbContext.OrganizationDateRelation.Add(new OrganizationDateRelation(){
+                Date_ID = dateToSet,
+                From = from,
+                To = to,
+                Organization_ID = organization
+            });
+            dbContext.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpGet("{id}/get-schedule")]
+        public IActionResult getSchedule(long id)
+        {
+            Organization organization = dbContext.Organization.FirstOrDefault(t => t.ID == id);
+            List<OrganizationDateRelation> schedule = dbContext.OrganizationDateRelation
+                .Where(t => t.Organization_ID == organization)
+                .Include(t => t.Organization_ID)
+                .Include(t => t.Date_ID)
+                .ToList();
+
+            return Ok(schedule);
+        }
+
+        [HttpGet("{id}/is-available/{requestDateToCheck}")]
+        public IActionResult isAvailable(long id, string requestDateToCheck)
+        {
+            DateTime dateToCheck = DateTime.Parse(requestDateToCheck);
+            Date dateOfWeek = dbContext.Date.First(t => t.Title == dateToCheck.DayOfWeek.ToString());
+            Organization organization = dbContext.Organization.FirstOrDefault(t => t.ID == id);
+
+            OrganizationDateRelation organizationScheduleAtDay = dbContext.OrganizationDateRelation
+                .FirstOrDefault(t => t.Organization_ID == organization && t.Date_ID == dateOfWeek);
+
+            string tmpRequestDate = dateToCheck.ToString("H:mm");
+            string tmpDateBaseDateFrom = organizationScheduleAtDay.From.ToString("H:mm");
+            string tmpDateBaseDateTo = organizationScheduleAtDay.To.ToString("H:mm");
+
+            bool result = DateTime.Parse(tmpRequestDate) > DateTime.Parse(tmpDateBaseDateFrom) && DateTime.Parse(tmpRequestDate) < DateTime.Parse(tmpDateBaseDateTo);
+            return Ok(result);
         }
 
         [HttpPost("{id}/set-avatar")]

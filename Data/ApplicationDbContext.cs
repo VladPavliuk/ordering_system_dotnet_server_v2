@@ -12,7 +12,9 @@ namespace mvc_auth.Data
     {
         public DbSet<Admin> Admin { get; set; }
         public DbSet<User> User { get; set; }
+        public DbSet<Date> Date { get; set; }
         public DbSet<Organization> Organization { get; set; }
+        public DbSet<OrganizationDateRelation> OrganizationDateRelation { get; set; }
         public DbSet<Service> Service { get; set; }
         public DbSet<OrganizationServiceRelation> OrganizationServiceRelation { get; set; }
         public DbSet<Order> Order { get; set; }

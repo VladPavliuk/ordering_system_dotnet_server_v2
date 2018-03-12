@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using mvc_auth.Data;
 using mvc_auth.Models;
 using mvc_auth.Services;
+using mvc_auth.Seeders;
 
 namespace mvc_auth
 {
@@ -35,12 +36,13 @@ namespace mvc_auth
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
+            services.AddTransient<DateTimesInitializare>();
 
             services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, DateTimesInitializare dateTimesInitializare)
         {
             if (env.IsDevelopment())
             {
@@ -62,6 +64,8 @@ namespace mvc_auth
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            dateTimesInitializare.Seed().Wait();
         }
     }
 }
