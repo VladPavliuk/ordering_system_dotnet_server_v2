@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Reservation.Controllers
 {   
@@ -104,6 +105,7 @@ namespace Reservation.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "ApiUser")]
         public IActionResult Create([FromBody]JObject data)
         {
             int userId = data["user_id"].ToObject<int>();
