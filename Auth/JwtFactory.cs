@@ -5,30 +5,47 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using mvc_auth.Models;
 using Microsoft.Extensions.Options;
- 
+using Microsoft.AspNetCore.Identity;
 
 namespace mvc_auth.Auth
 {
     public class JwtFactory : IJwtFactory
     {
         private readonly JwtIssuerOptions _jwtOptions;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public JwtFactory(IOptions<JwtIssuerOptions> jwtOptions)
+        public JwtFactory(
+            IOptions<JwtIssuerOptions> jwtOptions,
+            UserManager<ApplicationUser> userManager
+        )
         {
             _jwtOptions = jwtOptions.Value;
+            _userManager = userManager;
             ThrowIfInvalidOptions(_jwtOptions);
         }
 
         public async Task<string> GenerateEncodedToken(string userName, ClaimsIdentity identity)
         {
-            var claims = new[]
-         {
-                 new Claim(JwtRegisteredClaimNames.Sub, userName),
-                 new Claim(JwtRegisteredClaimNames.Jti, await _jwtOptions.JtiGenerator()),
-                 new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(_jwtOptions.IssuedAt).ToString(), ClaimValueTypes.Integer64),
-                 identity.FindFirst(Helpers.Constants.Strings.JwtClaimIdentifiers.Rol),
-                 identity.FindFirst(Helpers.Constants.Strings.JwtClaimIdentifiers.Id)
-             };
+            ApplicationUser user = await _userManager.FindByNameAsync(userName);
+            var claims = await _userManager.IsInRoleAsync(user, "Admin") 
+            ?
+            new[] {
+                new Claim(JwtRegisteredClaimNames.Sub, userName),
+                new Claim(JwtRegisteredClaimNames.Jti, await _jwtOptions.JtiGenerator()),
+                new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(_jwtOptions.IssuedAt).ToString(), ClaimValueTypes.Integer64),
+                new Claim("role", "Admin"),
+                identity.FindFirst(Helpers.Constants.Strings.JwtClaimIdentifiers.Rol),
+                identity.FindFirst(Helpers.Constants.Strings.JwtClaimIdentifiers.Id)
+            }
+            :
+            new[] {
+                new Claim(JwtRegisteredClaimNames.Sub, userName),
+                new Claim(JwtRegisteredClaimNames.Jti, await _jwtOptions.JtiGenerator()),
+                new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(_jwtOptions.IssuedAt).ToString(), ClaimValueTypes.Integer64),
+            //  new Claim("role", "Admin"),
+                identity.FindFirst(Helpers.Constants.Strings.JwtClaimIdentifiers.Rol),
+                identity.FindFirst(Helpers.Constants.Strings.JwtClaimIdentifiers.Id)
+            };
 
             // Create the JWT security token and encode it.
             var jwt = new JwtSecurityToken(

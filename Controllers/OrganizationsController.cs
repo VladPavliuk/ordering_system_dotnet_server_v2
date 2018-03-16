@@ -96,6 +96,7 @@ namespace Reservation.Controllers
                 .ToList();
         }
 
+        [Authorize(Roles="Admin")]
         [HttpGet]
         public IEnumerable<Organization> GetAll()
         { 
