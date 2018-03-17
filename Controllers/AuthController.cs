@@ -46,6 +46,16 @@ namespace mvc_auth.Controllers
           return new OkObjectResult(jwt);
         }
 
+        [HttpGet("is-admin")]
+        public async Task<IActionResult> isAdmin()
+        {
+            // var userName = HttpContext.User.IsInRole("Admin");
+            // ApplicationUser user = await _userManager.FindByNameAsync(HttpContext.User.userName);
+            // return Ok(await _userManager.IsInRoleAsync(user, "Admin"));
+
+            return Ok(HttpContext.User.IsInRole("Admin"));
+        }
+
         private async Task<ClaimsIdentity> GetClaimsIdentity(string userName, string password)
         {
             if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
