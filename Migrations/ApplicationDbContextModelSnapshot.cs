@@ -126,35 +126,6 @@ namespace mvc_auth.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("mvc_auth.Models.Admin", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("CreatedAt");
-
-                    b.Property<string>("Email");
-
-                    b.Property<string>("FirstName");
-
-                    b.Property<string>("LastName");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(50);
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasMaxLength(50);
-
-                    b.Property<string>("Token")
-                        .HasMaxLength(255);
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Admin");
-                });
-
             modelBuilder.Entity("mvc_auth.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -165,10 +136,14 @@ namespace mvc_auth.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
+                    b.Property<DateTime>("CreatedAt");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed");
+
+                    b.Property<string>("ImagePath");
 
                     b.Property<bool>("LockoutEnabled");
 
@@ -236,7 +211,7 @@ namespace mvc_auth.Migrations
 
                     b.Property<DateTime>("StartedAt");
 
-                    b.Property<int?>("User_IDId");
+                    b.Property<string>("User_IDId");
 
                     b.HasKey("ID");
 
@@ -263,11 +238,12 @@ namespace mvc_auth.Migrations
                     b.Property<string>("Title")
                         .IsRequired();
 
-                    b.Property<int>("User_IDId");
+                    b.Property<string>("UserId")
+                        .IsRequired();
 
                     b.HasKey("ID");
 
-                    b.HasIndex("User_IDId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Organization");
                 });
@@ -307,7 +283,7 @@ namespace mvc_auth.Migrations
 
                     b.Property<int?>("Organization_Service_IDID");
 
-                    b.Property<int?>("User_IDId");
+                    b.Property<string>("User_IDId");
 
                     b.Property<decimal>("Value");
 
@@ -367,30 +343,6 @@ namespace mvc_auth.Migrations
                     b.ToTable("Service");
                 });
 
-            modelBuilder.Entity("mvc_auth.Models.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("CreatedAt");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired();
-
-                    b.Property<string>("ImagePath");
-
-                    b.Property<string>("LastName")
-                        .IsRequired();
-
-                    b.Property<string>("Phone")
-                        .IsRequired()
-                        .HasMaxLength(50);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("User");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole")
@@ -446,16 +398,16 @@ namespace mvc_auth.Migrations
                         .WithMany()
                         .HasForeignKey("Service_IDID");
 
-                    b.HasOne("mvc_auth.Models.User", "User_ID")
+                    b.HasOne("mvc_auth.Models.ApplicationUser", "User_ID")
                         .WithMany()
                         .HasForeignKey("User_IDId");
                 });
 
             modelBuilder.Entity("mvc_auth.Models.Organization", b =>
                 {
-                    b.HasOne("mvc_auth.Models.User", "User_ID")
+                    b.HasOne("mvc_auth.Models.ApplicationUser", "User")
                         .WithMany()
-                        .HasForeignKey("User_IDId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -476,7 +428,7 @@ namespace mvc_auth.Migrations
                         .WithMany()
                         .HasForeignKey("Organization_Service_IDID");
 
-                    b.HasOne("mvc_auth.Models.User", "User_ID")
+                    b.HasOne("mvc_auth.Models.ApplicationUser", "User_ID")
                         .WithMany()
                         .HasForeignKey("User_IDId");
                 });

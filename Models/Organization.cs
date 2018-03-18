@@ -7,7 +7,7 @@ namespace mvc_auth.Models
     {
         public int ID { get; set; }
         [Required]
-        public User User_ID { get; set; }
+        public ApplicationUser User { get; set; }
         [Required]
         public string Title { get; set; }
         public string Description { get; set; }

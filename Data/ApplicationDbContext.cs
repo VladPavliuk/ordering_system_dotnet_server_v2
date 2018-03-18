@@ -10,8 +10,8 @@ namespace mvc_auth.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public DbSet<Admin> Admin { get; set; }
-        public DbSet<User> User { get; set; }
+        // public DbSet<Admin> Admin { get; set; }
+        // public DbSet<User> User { get; set; }
         public DbSet<Date> Date { get; set; }
         public DbSet<Organization> Organization { get; set; }
         public DbSet<OrganizationDateRelation> OrganizationDateRelation { get; set; }

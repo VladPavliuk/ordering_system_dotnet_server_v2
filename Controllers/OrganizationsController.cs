@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace Reservation.Controllers
 {   
@@ -17,11 +20,13 @@ namespace Reservation.Controllers
     public class OrganizationsController : Controller
     {
         private readonly ApplicationDbContext dbContext;
-
+        private readonly UserManager<ApplicationUser> _userManager;
         public OrganizationsController(
-            ApplicationDbContext dbContext
+            ApplicationDbContext dbContext,
+            UserManager<ApplicationUser> userManager
         )
         {
+            _userManager = userManager;
             this.dbContext = dbContext;
         }
 
@@ -96,27 +101,27 @@ namespace Reservation.Controllers
                 .ToList();
         }
 
-        [Authorize(Roles="Admin")]
         [HttpGet]
         public IEnumerable<Organization> GetAll()
         { 
             return this.dbContext.Organization
-            .Include(t => t.User_ID)
+            .Include(t => t.User)
             .ToList();
         }
 
         [HttpPost]
         [Authorize(Policy = "ApiUser")]
-        public IActionResult Create([FromBody]JObject data)
+        public async Task<IActionResult> Create([FromBody]JObject data)
         {
-            int userId = data["user_id"].ToObject<int>();
-            
-            User user = dbContext.User.FirstOrDefault(t => t.Id == userId);
-            if(user == null) {
-                return NotFound();
+            ApplicationUser user = await _userManager.FindByNameAsync(_userManager.GetUserId(User));
+
+            if (user == null)
+            {
+                throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
+
             Organization organization = new Organization();
-            organization.User_ID = user;
+            organization.User = user;
             organization.Title = data["title"].ToString();
             
             dbContext.Organization.Add(organization);
@@ -237,7 +242,7 @@ namespace Reservation.Controllers
         public Organization GetById(long id)
         {
             return dbContext.Organization
-                .Include(t => t.User_ID)
+                .Include(t => t.User)
                 .FirstOrDefault(t => t.ID == id);
         }
 

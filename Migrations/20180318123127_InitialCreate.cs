@@ -9,25 +9,6 @@ namespace mvc_auth.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Admin",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", nullable: true),
-                    FirstName = table.Column<string>(type: "TEXT", nullable: true),
-                    LastName = table.Column<string>(type: "TEXT", nullable: true),
-                    Password = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    Phone = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
-                    Token = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Admin", x => x.ID);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
                 {
@@ -48,8 +29,10 @@ namespace mvc_auth.Migrations
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     AccessFailedCount = table.Column<int>(type: "INTEGER", nullable: false),
                     ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     EmailConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    ImagePath = table.Column<string>(type: "TEXT", nullable: true),
                     LockoutEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
                     NormalizedEmail = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
@@ -95,23 +78,6 @@ namespace mvc_auth.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Service", x => x.ID);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "User",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    FirstName = table.Column<string>(type: "TEXT", nullable: false),
-                    ImagePath = table.Column<string>(type: "TEXT", nullable: true),
-                    LastName = table.Column<string>(type: "TEXT", nullable: false),
-                    Phone = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_User", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -230,15 +196,15 @@ namespace mvc_auth.Migrations
                     Description = table.Column<string>(type: "TEXT", nullable: true),
                     ImagePath = table.Column<string>(type: "TEXT", nullable: true),
                     Title = table.Column<string>(type: "TEXT", nullable: false),
-                    User_IDId = table.Column<int>(type: "INTEGER", nullable: false)
+                    UserId = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Organization", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Organization_User_User_IDId",
-                        column: x => x.User_IDId,
-                        principalTable: "User",
+                        name: "FK_Organization_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -255,7 +221,7 @@ namespace mvc_auth.Migrations
                     Price = table.Column<decimal>(type: "TEXT", nullable: false),
                     Service_IDID = table.Column<int>(type: "INTEGER", nullable: true),
                     StartedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    User_IDId = table.Column<int>(type: "INTEGER", nullable: true)
+                    User_IDId = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -273,9 +239,9 @@ namespace mvc_auth.Migrations
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Order_User_User_IDId",
+                        name: "FK_Order_AspNetUsers_User_IDId",
                         column: x => x.User_IDId,
-                        principalTable: "User",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -348,7 +314,7 @@ namespace mvc_auth.Migrations
                     Comment = table.Column<string>(type: "TEXT", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Organization_Service_IDID = table.Column<int>(type: "INTEGER", nullable: true),
-                    User_IDId = table.Column<int>(type: "INTEGER", nullable: true),
+                    User_IDId = table.Column<string>(type: "TEXT", nullable: true),
                     Value = table.Column<decimal>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -361,9 +327,9 @@ namespace mvc_auth.Migrations
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_OrganizationMarkup_User_User_IDId",
+                        name: "FK_OrganizationMarkup_AspNetUsers_User_IDId",
                         column: x => x.User_IDId,
-                        principalTable: "User",
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -421,9 +387,9 @@ namespace mvc_auth.Migrations
                 column: "User_IDId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Organization_User_IDId",
+                name: "IX_Organization_UserId",
                 table: "Organization",
-                column: "User_IDId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrganizationDateRelation_Date_IDID",
@@ -459,9 +425,6 @@ namespace mvc_auth.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Admin");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
@@ -489,9 +452,6 @@ namespace mvc_auth.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
                 name: "Date");
 
             migrationBuilder.DropTable(
@@ -504,7 +464,7 @@ namespace mvc_auth.Migrations
                 name: "Service");
 
             migrationBuilder.DropTable(
-                name: "User");
+                name: "AspNetUsers");
         }
     }
 }

@@ -20,22 +20,22 @@ namespace Reservation.Controllers
             this.dbContext = dbContext;
         }
 
-        [HttpGet]
-        public IEnumerable<User> GetAll()
-        { 
-            return dbContext.User.ToList();
-        }
+        // [HttpGet]
+        // public IEnumerable<User> GetAll()
+        // { 
+        //     return dbContext.User.ToList();
+        // }
 
-        [HttpPost]
-        public IActionResult Create([FromBody] User userTostore)
-        {
-            User user = new User { FirstName = userTostore.FirstName, LastName = userTostore.LastName, Phone = userTostore.Phone };
+        // [HttpPost]
+        // public IActionResult Create([FromBody] User userTostore)
+        // {
+        //     User user = new User { FirstName = userTostore.FirstName, LastName = userTostore.LastName, Phone = userTostore.Phone };
 
-            dbContext.User.Add(user);
-            dbContext.SaveChanges();
+        //     dbContext.User.Add(user);
+        //     dbContext.SaveChanges();
 
-            return Ok();
-        }
+        //     return Ok();
+        // }
 
     //     [HttpPut("{id}")]
     //     public IActionResult Update(long id, [FromBody] User user)

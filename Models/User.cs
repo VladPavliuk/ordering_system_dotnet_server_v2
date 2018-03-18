@@ -7,13 +7,14 @@ namespace mvc_auth.Models
     public class User
     {
         public int Id { get; set; }
-        [Required]
-        public string FirstName { get; set; }
-        [Required]
-        public string LastName { get; set; }
-        [Required]
-        [MaxLength(50)] 
-        public string Phone { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
+        // [Required]
+        // public string FirstName { get; set; }
+        // [Required]
+        // public string LastName { get; set; }
+        // [Required]
+        // [MaxLength(50)] 
+        // public string Phone { get; set; }
         // [Required]
         // [MaxLength(50)] 
         // [DataType(DataType.Password)]

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using mvc_auth.Models.AccountViewModels;
+using Newtonsoft.Json.Linq;
 
 namespace mvc_auth.Controllers
 {
@@ -34,8 +35,6 @@ namespace mvc_auth.Controllers
                 return BadRequest(ModelState);
             }
 
-            // return Ok();
-
             var identity = await GetClaimsIdentity(credentials.Email, credentials.Password);
             if (identity == null)
             {
@@ -43,11 +42,19 @@ namespace mvc_auth.Controllers
             }
 
           var jwt = await Tokens.GenerateJwt(identity, _jwtFactory, credentials.Email, _jwtOptions, new JsonSerializerSettings { Formatting = Formatting.Indented });
-          return new OkObjectResult(jwt);
+
+          JObject jwtObject = JObject.Parse(jwt);
+
+          ApplicationUser user = await _userManager.FindByNameAsync(identity.Name);
+          var isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+
+          jwtObject.Add("is_admin", isAdmin);
+
+          return new OkObjectResult(JsonConvert.SerializeObject(jwtObject));
         }
 
         [HttpGet("is-admin")]
-        public async Task<IActionResult> isAdmin()
+        public IActionResult isAdmin()
         {
             // var userName = HttpContext.User.IsInRole("Admin");
             // ApplicationUser user = await _userManager.FindByNameAsync(HttpContext.User.userName);
