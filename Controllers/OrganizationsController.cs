@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using System.Security.Claims;
+using System.Text;
 
 namespace Reservation.Controllers
 {   
@@ -30,8 +31,9 @@ namespace Reservation.Controllers
             this.dbContext = dbContext;
         }
 
+        [Authorize(Policy = "ApiUser")]
         [HttpPost("pin-service/{organizationId}/{serviceId}")]
-        public IActionResult PinService(int organizationId, int serviceId)
+        public async Task<IActionResult> PinService(int organizationId, int serviceId)
         {
             Organization organization = dbContext.Organization.FirstOrDefault(t => t.ID == organizationId);
             Service service = dbContext.Service.FirstOrDefault(t => t.ID == serviceId);
@@ -47,14 +49,19 @@ namespace Reservation.Controllers
                 Duration = service.Duration
             };
 
-            dbContext.OrganizationServiceRelation.Add(organizationServiceRelation);
-            dbContext.SaveChanges();
+            ApplicationUser user = await _userManager.FindByNameAsync(_userManager.GetUserId(User));
+            if(organization.User == user) {
+                dbContext.OrganizationServiceRelation.Add(organizationServiceRelation);
+                dbContext.SaveChanges();
 
-            return new ObjectResult(organizationServiceRelation);
+                return new ObjectResult(organizationServiceRelation);
+            }
+            return BadRequest();
         } 
 
+        [Authorize(Policy = "ApiUser")]
         [HttpDelete("unpin-service/{organizationId}/{serviceId}")]
-        public IActionResult UnpinService(int organizationId, int serviceId)
+        public async Task<IActionResult> UnpinService(int organizationId, int serviceId)
         {
             Organization organization = dbContext.Organization.FirstOrDefault(t => t.ID == organizationId);
             Service service = dbContext.Service.FirstOrDefault(t => t.ID == serviceId);
@@ -63,15 +70,19 @@ namespace Reservation.Controllers
                 return NotFound();
             } 
 
-            dbContext.OrganizationServiceRelation.RemoveRange(
-                dbContext.OrganizationServiceRelation.Where(t => t.Organization_ID == organization && t.Service_ID == service)
-            );
-            dbContext.SaveChanges();
-            return Ok();
+            ApplicationUser user = await _userManager.FindByNameAsync(_userManager.GetUserId(User));
+            if(organization.User == user) {
+                dbContext.OrganizationServiceRelation.RemoveRange(dbContext.OrganizationServiceRelation.Where(t => t.Organization_ID == organization && t.Service_ID == service));
+                dbContext.SaveChanges();
+
+                return Ok();
+            }
+            return BadRequest();
         }
 
+        [Authorize(Policy = "ApiUser")]
         [HttpGet("{id}/available-services")]
-        public IEnumerable<Service> OtherSerivcesInOrganization(int id)
+        public async Task<IEnumerable<Service>> OtherSerivcesInOrganization(int id)
         {
             Organization organization = dbContext.Organization.FirstOrDefault(t => t.ID == id);
 
@@ -79,10 +90,15 @@ namespace Reservation.Controllers
                 return Enumerable.Empty<Service>();
             }
 
-            return dbContext.Service
+            ApplicationUser user = await _userManager.FindByNameAsync(_userManager.GetUserId(User));
+            if(organization.User == user) {
+                return dbContext.Service
                 .Where(t => !dbContext.OrganizationServiceRelation
                 .Any(b => t.ID == b.Service_ID.ID && organization == b.Organization_ID))
                 .ToList();
+            }
+
+           return Enumerable.Empty<Service>();
         }
 
         [HttpGet("{id}/services-list")]
@@ -160,6 +176,7 @@ namespace Reservation.Controllers
             return Ok();
         }
 
+        [Authorize(Policy = "ApiUser")]
         [HttpPost("{id}/set-schedule")]
         public IActionResult setSchedule(long id, [FromBody]JObject data)
         {
@@ -214,13 +231,16 @@ namespace Reservation.Controllers
             return Ok(result);
         }
 
+        [Authorize(Policy = "ApiUser")]
         [HttpPost("{id}/set-avatar")]
-        public IActionResult SetAvatar(long id, IFormFile Image)
+        public async Task<IActionResult> SetAvatar(long id, IFormFile Image)
         {
             Organization organization = dbContext.Organization.FirstOrDefault(t => t.ID == (int) id);
-            if (Image!= null)
+            ApplicationUser user = await _userManager.FindByNameAsync(_userManager.GetUserId(User));
+
+            if (Image!= null && organization.User == user)
             {
-                string fileName = organization.ID + "_" + organization.Title + "_" + DateTime.Now.ToString("y_M_d");
+                string fileName = RandomString(30);
                 switch(Image.ContentType) {
                     case "image/jpeg": {
                         fileName += ".jpeg";
@@ -237,9 +257,9 @@ namespace Reservation.Controllers
                 
                 using (FileStream fs = System.IO.File.Create("wwwroot/images/organizations/" + fileName))
                 {
-                    Image.CopyToAsync(fs);
+                    await Image.CopyToAsync(fs);
 
-                    organization.ImagePath = "wwwroot/images/organizations/" + fileName;
+                    organization.ImagePath = "/images/organizations/" + fileName;
                     dbContext.Organization.Update(organization);
                     dbContext.SaveChanges();
                 }
@@ -248,6 +268,19 @@ namespace Reservation.Controllers
             }
 
             return BadRequest();
+        }
+
+        private string RandomString(int size)
+        {
+            StringBuilder builder = new StringBuilder();
+            Random random = new Random();
+            char ch ;
+            for(int i=0; i<size; i++)
+            {
+                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65))) ;
+                builder.Append(ch);
+            }
+            return builder.ToString();
         }
 
         [HttpPut("{id}")]

@@ -237,12 +237,11 @@ namespace mvc_auth.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        // [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            _logger.LogInformation("User logged out.");
-            return RedirectToAction(nameof(HomeController.Index), "Home");
+            return Ok(HttpContext.User.Identity.IsAuthenticated);
         }
 
         [HttpPost]

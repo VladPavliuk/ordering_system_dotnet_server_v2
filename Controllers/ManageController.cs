@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using mvc_auth.Data;
 using mvc_auth.Models;
 using mvc_auth.Models.ManageViewModels;
 using mvc_auth.Services;
@@ -17,24 +20,27 @@ using mvc_auth.Services;
 namespace mvc_auth.Controllers
 {
     [Authorize]
-    [Route("[controller]/[action]")]
+    [Route("api/[controller]")]
     public class ManageController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _dbContext;
         private readonly ILogger _logger;
         private readonly UrlEncoder _urlEncoder;
 
         private const string AuthenicatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
         public ManageController(
-          UserManager<ApplicationUser> userManager,
-          SignInManager<ApplicationUser> signInManager,
-          IEmailSender emailSender,
-          ILogger<ManageController> logger,
-          UrlEncoder urlEncoder)
+            ApplicationDbContext dbContext,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
+            IEmailSender emailSender,
+            ILogger<ManageController> logger,
+            UrlEncoder urlEncoder)
         {
+            _dbContext = dbContext;
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
@@ -64,6 +70,65 @@ namespace mvc_auth.Controllers
             };
 
             return Ok(model);
+        }
+
+        [Authorize(Policy = "ApiUser")]
+        [HttpGet("user")]
+        public async Task<IActionResult> GetUserInfo()
+        {
+            return Ok(await _userManager.FindByNameAsync(_userManager.GetUserId(User)));
+        }
+
+        [Authorize(Policy = "ApiUser")]
+        [HttpPost("set-avatar")]
+        public async Task<IActionResult> SetAvatar(IFormFile Image)
+        {
+            ApplicationUser user = await _userManager.FindByNameAsync(_userManager.GetUserId(User));
+
+            if (Image!= null)
+            {
+                string fileName = RandomString(30);;
+                switch(Image.ContentType) {
+                    case "image/jpeg": {
+                        fileName += ".jpeg";
+                        break;
+                    }
+                    case "image/png": {
+                        fileName += ".png";
+                        break;
+                    }
+                    default: {
+                        return BadRequest();
+                    }
+                }
+                
+                using (FileStream fs = System.IO.File.Create("wwwroot/images/users/" + fileName))
+                {
+                    await Image.CopyToAsync(fs);
+                    user.ImagePath = "/images/users/" + fileName;
+                    await _userManager.UpdateAsync(user);
+                    
+                    // dbContext.Organization.Update(organization);
+                    // dbContext.SaveChanges();
+                }
+                
+                return Ok(true);   
+            }
+
+            return BadRequest();
+        }
+
+        private string RandomString(int size)
+        {
+            StringBuilder builder = new StringBuilder();
+            Random random = new Random();
+            char ch ;
+            for(int i=0; i<size; i++)
+            {
+                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65))) ;
+                builder.Append(ch);
+            }
+            return builder.ToString();
         }
 
         [HttpPost]
