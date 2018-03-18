@@ -109,6 +109,36 @@ namespace Reservation.Controllers
             .ToList();
         }
 
+        [HttpGet("owner")]
+        [Authorize(Policy = "ApiUser")]
+        public async Task<IEnumerable<Organization>> GetAllWhereOwner()
+        { 
+            ApplicationUser user = await _userManager.FindByNameAsync(_userManager.GetUserId(User));
+
+            return this.dbContext.Organization
+                .Where(t => t.User == user)
+                .Include(t => t.User)
+                .ToList();
+        }
+
+        [HttpGet("{id}/is-belong-to-me")]
+        [Authorize(Policy = "ApiUser")]
+        public async Task<IActionResult> isOrganizationBelongToAuthUser(int id)
+        {
+            Organization organization = dbContext.Organization.FirstOrDefault(t => t.ID == id);
+
+            if(organization == null) {
+                return NotFound();
+            }
+
+            ApplicationUser user = await _userManager.FindByNameAsync(_userManager.GetUserId(User));
+            if(organization.User == user) {
+                return Ok(true);
+            }
+            
+            return Ok(false);
+        }
+
         [HttpPost]
         [Authorize(Policy = "ApiUser")]
         public async Task<IActionResult> Create([FromBody]JObject data)
