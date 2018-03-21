@@ -55,7 +55,7 @@ namespace mvc_auth.Controllers
             dbContext.Order.Add(new Order() { 
                 Organization_ID = organization,
                 Service_ID = service,
-                Price = data["Service_ID"].ToObject<int>(),
+                Price = data["Price"].ToObject<int>(),
                 User_ID = user,
                 StartedAt = data["StartedAt"].ToObject<DateTime>(),
                 EndedAt = data["StartedAt"].ToObject<DateTime>().AddMinutes(data["Duration"].ToObject<int>()),

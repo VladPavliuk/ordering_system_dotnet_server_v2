@@ -143,7 +143,11 @@ namespace mvc_auth.Migrations
 
                     b.Property<bool>("EmailConfirmed");
 
+                    b.Property<string>("FirstName");
+
                     b.Property<string>("ImagePath");
+
+                    b.Property<string>("LastName");
 
                     b.Property<bool>("LockoutEnabled");
 
@@ -187,7 +191,11 @@ namespace mvc_auth.Migrations
 
                     b.Property<DateTime>("CreatedAt");
 
+                    b.Property<TimeSpan?>("From");
+
                     b.Property<string>("Title");
+
+                    b.Property<TimeSpan?>("To");
 
                     b.HasKey("ID");
 
@@ -257,11 +265,15 @@ namespace mvc_auth.Migrations
 
                     b.Property<int?>("Date_IDID");
 
-                    b.Property<DateTime>("From");
+                    b.Property<TimeSpan?>("From");
+
+                    b.Property<bool?>("IsDayAndNight");
+
+                    b.Property<bool?>("IsHoliday");
 
                     b.Property<int?>("Organization_IDID");
 
-                    b.Property<DateTime>("To");
+                    b.Property<TimeSpan?>("To");
 
                     b.HasKey("ID");
 

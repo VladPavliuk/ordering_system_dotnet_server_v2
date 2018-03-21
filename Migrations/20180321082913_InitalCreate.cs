@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace mvc_auth.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class InitalCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -32,7 +32,9 @@ namespace mvc_auth.Migrations
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     EmailConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    FirstName = table.Column<string>(type: "TEXT", nullable: true),
                     ImagePath = table.Column<string>(type: "TEXT", nullable: true),
+                    LastName = table.Column<string>(type: "TEXT", nullable: true),
                     LockoutEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
                     NormalizedEmail = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
@@ -56,7 +58,9 @@ namespace mvc_auth.Migrations
                     ID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Title = table.Column<string>(type: "TEXT", nullable: true)
+                    From = table.Column<TimeSpan>(type: "TEXT", nullable: true),
+                    Title = table.Column<string>(type: "TEXT", nullable: true),
+                    To = table.Column<TimeSpan>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -254,9 +258,11 @@ namespace mvc_auth.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Date_IDID = table.Column<int>(type: "INTEGER", nullable: true),
-                    From = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    From = table.Column<TimeSpan>(type: "TEXT", nullable: true),
+                    IsDayAndNight = table.Column<bool>(type: "INTEGER", nullable: true),
+                    IsHoliday = table.Column<bool>(type: "INTEGER", nullable: true),
                     Organization_IDID = table.Column<int>(type: "INTEGER", nullable: true),
-                    To = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    To = table.Column<TimeSpan>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {

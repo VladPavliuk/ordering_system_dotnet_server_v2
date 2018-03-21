@@ -182,17 +182,19 @@ namespace Reservation.Controllers
         {
             DateTime from = DateTime.Parse(data["from"].ToObject<String>());
             DateTime to = DateTime.Parse(data["to"].ToObject<String>());
-            Date dateToSet = dbContext.Date.FirstOrDefault(t => t.Title == data["date"].ToObject<string>());
+            Date dateToSet = dbContext.Date.FirstOrDefault(t => t.ID == data["dateId"].ToObject<int>());
             Organization organization = dbContext.Organization.FirstOrDefault(t => t.ID == id);
 
             if(dateToSet == null || organization == null) {
                  return BadRequest();
             } 
 
-             dbContext.OrganizationDateRelation.Add(new OrganizationDateRelation(){
+            dbContext.OrganizationDateRelation.Add(new OrganizationDateRelation(){
                 Date_ID = dateToSet,
-                From = from,
-                To = to,
+                From = data["from"].ToObject<TimeSpan>(),
+                To = data["to"].ToObject<TimeSpan>(),
+                IsDayAndNight = data["isDayAndNight"] == null ? data["isDayAndNight"].ToObject<bool>() : false,
+                IsHoliday = data["isHoliday"] == null ? data["isHoliday"].ToObject<bool>() : false,
                 Organization_ID = organization
             });
             dbContext.SaveChanges();
@@ -213,23 +215,23 @@ namespace Reservation.Controllers
             return Ok(schedule);
         }
 
-        [HttpGet("{id}/is-available/{requestDateToCheck}")]
-        public IActionResult isAvailable(long id, string requestDateToCheck)
-        {
-            DateTime dateToCheck = DateTime.Parse(requestDateToCheck);
-            Date dateOfWeek = dbContext.Date.First(t => t.Title == dateToCheck.DayOfWeek.ToString());
-            Organization organization = dbContext.Organization.FirstOrDefault(t => t.ID == id);
+        // [HttpGet("{id}/is-available/{requestDateToCheck}")]
+        // public IActionResult isAvailable(long id, string requestDateToCheck)
+        // {
+        //     DateTime dateToCheck = DateTime.Parse(requestDateToCheck);
+        //     Date dateOfWeek = dbContext.Date.First(t => t.Title == dateToCheck.DayOfWeek.ToString());
+        //     Organization organization = dbContext.Organization.FirstOrDefault(t => t.ID == id);
 
-            OrganizationDateRelation organizationScheduleAtDay = dbContext.OrganizationDateRelation
-                .FirstOrDefault(t => t.Organization_ID == organization && t.Date_ID == dateOfWeek);
+        //     OrganizationDateRelation organizationScheduleAtDay = dbContext.OrganizationDateRelation
+        //         .FirstOrDefault(t => t.Organization_ID == organization && t.Date_ID == dateOfWeek);
 
-            string tmpRequestDate = dateToCheck.ToString("H:mm");
-            string tmpDateBaseDateFrom = organizationScheduleAtDay.From.ToString("H:mm");
-            string tmpDateBaseDateTo = organizationScheduleAtDay.To.ToString("H:mm");
+        //     string tmpRequestDate = dateToCheck.ToString("H:mm");
+        //     string tmpDateBaseDateFrom = organizationScheduleAtDay.From.ToString("H:mm");
+        //     string tmpDateBaseDateTo = organizationScheduleAtDay.To.ToString("H:mm");
 
-            bool result = DateTime.Parse(tmpRequestDate) > DateTime.Parse(tmpDateBaseDateFrom) && DateTime.Parse(tmpRequestDate) < DateTime.Parse(tmpDateBaseDateTo);
-            return Ok(result);
-        }
+        //     bool result = DateTime.Parse(tmpRequestDate) > DateTime.Parse(tmpDateBaseDateFrom) && DateTime.Parse(tmpRequestDate) < DateTime.Parse(tmpDateBaseDateTo);
+        //     return Ok(result);
+        // }
 
         [Authorize(Policy = "ApiUser")]
         [HttpPost("{id}/set-avatar")]

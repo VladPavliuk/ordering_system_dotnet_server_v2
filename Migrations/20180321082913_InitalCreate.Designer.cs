@@ -11,8 +11,8 @@ using System;
 namespace mvc_auth.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180318123127_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20180321082913_InitalCreate")]
+    partial class InitalCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -144,7 +144,11 @@ namespace mvc_auth.Migrations
 
                     b.Property<bool>("EmailConfirmed");
 
+                    b.Property<string>("FirstName");
+
                     b.Property<string>("ImagePath");
+
+                    b.Property<string>("LastName");
 
                     b.Property<bool>("LockoutEnabled");
 
@@ -188,7 +192,11 @@ namespace mvc_auth.Migrations
 
                     b.Property<DateTime>("CreatedAt");
 
+                    b.Property<TimeSpan?>("From");
+
                     b.Property<string>("Title");
+
+                    b.Property<TimeSpan?>("To");
 
                     b.HasKey("ID");
 
@@ -258,11 +266,15 @@ namespace mvc_auth.Migrations
 
                     b.Property<int?>("Date_IDID");
 
-                    b.Property<DateTime>("From");
+                    b.Property<TimeSpan?>("From");
+
+                    b.Property<bool?>("IsDayAndNight");
+
+                    b.Property<bool?>("IsHoliday");
 
                     b.Property<int?>("Organization_IDID");
 
-                    b.Property<DateTime>("To");
+                    b.Property<TimeSpan?>("To");
 
                     b.HasKey("ID");
 

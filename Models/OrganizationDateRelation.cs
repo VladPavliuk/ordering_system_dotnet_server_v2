@@ -8,15 +8,10 @@ namespace mvc_auth.Models
         public int ID { get; set; }
         public Organization Organization_ID { get; set; }
         public Date Date_ID { get; set; }
-
-        [DisplayFormat(DataFormatString = "{0:H:mm}")]
-        [Required]
-        public DateTime From { get; set; }
-
-        [DisplayFormat(DataFormatString = "{0:H:mm}")]
-        [Required]
-        public DateTime To { get; set; }
-        
+        public TimeSpan? From { get; set; }
+        public TimeSpan? To { get; set; }
+        public bool? IsDayAndNight { get; set; } = false;
+        public bool? IsHoliday { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

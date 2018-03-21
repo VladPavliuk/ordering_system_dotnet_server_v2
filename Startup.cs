@@ -109,14 +109,20 @@ namespace mvc_auth
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<DateTimesInitializare>();
+            services.AddTransient<ServicesInitializare>();
             // services.AddSingleton<IAuthorizationHandler, AdminHandler>();
 
             services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, DateTimesInitializare dateTimesInitializare, IServiceProvider serviceProvider)
-        {
+        public void Configure(
+            IApplicationBuilder app, 
+            IHostingEnvironment env,
+            DateTimesInitializare dateTimesInitializare, 
+            ServicesInitializare servicesInitializare, 
+            IServiceProvider serviceProvider
+        ) {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -144,7 +150,8 @@ namespace mvc_auth
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            // dateTimesInitializare.Seed().Wait();
+            servicesInitializare.Seed().Wait();
+            dateTimesInitializare.Seed().Wait();
             CreateRoles(serviceProvider).Wait();
         }
 
@@ -154,7 +161,7 @@ namespace mvc_auth
             var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var UserManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-            string[] roleNames = { "Admin", "User" };
+            string[] roleNames = { "Admin" };
 
             IdentityResult roleResult;
 
