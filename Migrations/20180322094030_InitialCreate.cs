@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace mvc_auth.Migrations
 {
-    public partial class InitalCreate : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -319,7 +319,7 @@ namespace mvc_auth.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Comment = table.Column<string>(type: "TEXT", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Organization_Service_IDID = table.Column<int>(type: "INTEGER", nullable: true),
+                    Order_IDID = table.Column<int>(type: "INTEGER", nullable: true),
                     User_IDId = table.Column<string>(type: "TEXT", nullable: true),
                     Value = table.Column<decimal>(type: "TEXT", nullable: false)
                 },
@@ -327,9 +327,9 @@ namespace mvc_auth.Migrations
                 {
                     table.PrimaryKey("PK_OrganizationMarkup", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_OrganizationMarkup_OrganizationServiceRelation_Organization_Service_IDID",
-                        column: x => x.Organization_Service_IDID,
-                        principalTable: "OrganizationServiceRelation",
+                        name: "FK_OrganizationMarkup_Order_Order_IDID",
+                        column: x => x.Order_IDID,
+                        principalTable: "Order",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -408,9 +408,9 @@ namespace mvc_auth.Migrations
                 column: "Organization_IDID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrganizationMarkup_Organization_Service_IDID",
+                name: "IX_OrganizationMarkup_Order_IDID",
                 table: "OrganizationMarkup",
-                column: "Organization_Service_IDID");
+                column: "Order_IDID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrganizationMarkup_User_IDId",
@@ -446,13 +446,13 @@ namespace mvc_auth.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Order");
-
-            migrationBuilder.DropTable(
                 name: "OrganizationDateRelation");
 
             migrationBuilder.DropTable(
                 name: "OrganizationMarkup");
+
+            migrationBuilder.DropTable(
+                name: "OrganizationServiceRelation");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -461,7 +461,7 @@ namespace mvc_auth.Migrations
                 name: "Date");
 
             migrationBuilder.DropTable(
-                name: "OrganizationServiceRelation");
+                name: "Order");
 
             migrationBuilder.DropTable(
                 name: "Organization");

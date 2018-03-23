@@ -39,6 +39,59 @@ namespace mvc_auth.Controllers
                 .ToList();
         }
 
+        [Authorize(Policy = "ApiUser")]
+        [HttpGet("{id}/get-markup")]
+        public async Task<IActionResult> getMurkup(int id)
+        {
+            Order order = await dbContext.Order.Where(t => t.ID == id).FirstOrDefaultAsync();
+
+            return Ok(await dbContext.OrganizationMarkup.Where(t => t.Order_ID == order).FirstOrDefaultAsync());
+        }
+
+        [Authorize(Policy = "ApiUser")]
+        [HttpPost("{id}/set-markup")]
+        public async Task<IActionResult> setMarkup(int id, [FromBody]JObject data)
+        {
+            ApplicationUser user = await _userManager.FindByNameAsync(_userManager.GetUserId(User));
+            Order order = await dbContext.Order
+                .Where(t => t.ID == id)
+                .Where(t => t.User_ID == user)
+                .Include(t => t.Service_ID)
+                .Include(t => t.Organization_ID)
+                .FirstOrDefaultAsync();
+
+            if(dbContext.OrganizationMarkup.Any(t => t.Order_ID == order)) {
+                return BadRequest();
+            }
+
+            OrganizationRating organizationRating = new OrganizationRating(){
+                Order_ID = order,
+                User_ID = user,
+                Value = data["value"].ToObject<decimal>(),
+                Comment = data["comment"].ToObject<string>()
+            };
+
+            dbContext.OrganizationMarkup.Add(organizationRating);
+
+            await dbContext.SaveChangesAsync();
+
+            return Ok(organizationRating);
+        }
+
+        [HttpGet("{id}")]
+        [Authorize(Policy = "ApiUser")]
+        public async Task<Order> getSingleOrder(int id)
+        {
+            ApplicationUser user = await _userManager.FindByNameAsync(_userManager.GetUserId(User));
+
+            return await dbContext.Order
+                .Where(t => t.ID == id)
+                .Where(t => t.User_ID == user)
+                .Include(t => t.Service_ID)
+                .Include(t => t.Organization_ID)
+                .FirstOrDefaultAsync();
+        }
+
         [HttpPost]
         [Authorize(Policy = "ApiUser")]
         [Route("make-order")]

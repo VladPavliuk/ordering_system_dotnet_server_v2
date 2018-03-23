@@ -293,7 +293,7 @@ namespace mvc_auth.Migrations
 
                     b.Property<DateTime>("CreatedAt");
 
-                    b.Property<int?>("Organization_Service_IDID");
+                    b.Property<int?>("Order_IDID");
 
                     b.Property<string>("User_IDId");
 
@@ -301,7 +301,7 @@ namespace mvc_auth.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("Organization_Service_IDID");
+                    b.HasIndex("Order_IDID");
 
                     b.HasIndex("User_IDId");
 
@@ -436,9 +436,9 @@ namespace mvc_auth.Migrations
 
             modelBuilder.Entity("mvc_auth.Models.OrganizationRating", b =>
                 {
-                    b.HasOne("mvc_auth.Models.OrganizationServiceRelation", "Organization_Service_ID")
+                    b.HasOne("mvc_auth.Models.Order", "Order_ID")
                         .WithMany()
-                        .HasForeignKey("Organization_Service_IDID");
+                        .HasForeignKey("Order_IDID");
 
                     b.HasOne("mvc_auth.Models.ApplicationUser", "User_ID")
                         .WithMany()

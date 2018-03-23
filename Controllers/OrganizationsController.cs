@@ -169,9 +169,34 @@ namespace Reservation.Controllers
             Organization organization = new Organization();
             organization.User = user;
             organization.Title = data["title"].ToString();
-            
+
             dbContext.Organization.Add(organization);
             dbContext.SaveChanges();
+
+            var schedule = data["schedule"];
+            if(schedule != null) {
+                JObject[] scheduleList = schedule.ToObject<JObject[]>();
+
+                for(int i = 0; i < scheduleList.Length; i++) {
+                    int dateId = scheduleList[i]["id"].ToObject<int>();
+                    Date date = dbContext.Date.Where(t => t.ID == dateId).FirstOrDefault();
+                    if( date != null) {
+                        OrganizationDateRelation organizationDateRelation = new OrganizationDateRelation {
+                            Organization_ID = organization,
+                            Date_ID = date,
+                            From = scheduleList[i]["from"].ToObject<TimeSpan>(),
+                            To = scheduleList[i]["to"].ToObject<TimeSpan>(),
+                            IsDayAndNight = scheduleList[i]["isAllDayAndNight"] == null ? false : scheduleList[i]["isAllDayAndNight"].ToObject<bool>(),
+                            IsHoliday = scheduleList[i]["isHoliday"] == null ? false : scheduleList[i]["isHoliday"].ToObject<bool>()
+                        };
+
+                        dbContext.OrganizationDateRelation.Add(organizationDateRelation);
+                    }
+                    
+                }
+            }
+            
+           dbContext.SaveChanges();
 
             return Ok();
         }
