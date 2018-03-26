@@ -227,6 +227,30 @@ namespace Reservation.Controllers
             return Ok();
         }
 
+        [HttpGet("{organization_id}/{service_id}/mark")]
+        public async Task<IActionResult> getAverageMark(int organization_id, int service_id)
+        {
+            Organization organization = dbContext.Organization.Where(t => t.ID == organization_id).FirstOrDefault();
+            Service service = dbContext.Service.Where(t => t.ID == service_id).FirstOrDefault();
+            List<Order> orders = dbContext.Order.Where(t => t.Organization_ID == organization && t.Service_ID == service).ToList();
+
+            if(organization == null || service == null || orders == null) {
+                return BadRequest();
+            }
+
+            List<decimal> organizationRating = new List<decimal>();
+
+            foreach(var order in orders) {
+                organizationRating.Add(dbContext.OrganizationMarkup.Where(t => t.Order_ID == order).Select(t => t.Value).FirstOrDefault());
+            }
+            
+            if(!organizationRating.Any() || organizationRating == null) {
+                return Ok();
+            }
+
+            return Ok(organizationRating.Average());
+        }
+
         [HttpGet("{id}/get-schedule")]
         public IActionResult getSchedule(long id)
         {

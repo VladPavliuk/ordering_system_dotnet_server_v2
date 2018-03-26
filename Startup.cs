@@ -172,7 +172,7 @@ namespace mvc_auth
                 //creating the roles and seeding them to the database
 
                 var roleExist = await RoleManager.RoleExistsAsync(roleName);
-
+    
                 if (!roleExist)
 
                 {
