@@ -264,23 +264,34 @@ namespace Reservation.Controllers
             return Ok(schedule);
         }
 
-        // [HttpGet("{id}/is-available/{requestDateToCheck}")]
-        // public IActionResult isAvailable(long id, string requestDateToCheck)
-        // {
-        //     DateTime dateToCheck = DateTime.Parse(requestDateToCheck);
-        //     Date dateOfWeek = dbContext.Date.First(t => t.Title == dateToCheck.DayOfWeek.ToString());
-        //     Organization organization = dbContext.Organization.FirstOrDefault(t => t.ID == id);
+        [HttpGet("{id}/is-available/{requestDateFrom}/{requestDateTo}")]
+        public IActionResult isAvailable(long id, string requestDateFrom, string requestDateTo)
+        {
+            DateTime fromDateToCheck = DateTime.Parse(requestDateFrom);
+            DateTime toDateToCheck = DateTime.Parse(requestDateTo);
+            Date dateOfWeek = dbContext.Date.First(t => t.Title == fromDateToCheck.DayOfWeek.ToString());
+            Organization organization = dbContext.Organization.FirstOrDefault(t => t.ID == id);
 
-        //     OrganizationDateRelation organizationScheduleAtDay = dbContext.OrganizationDateRelation
-        //         .FirstOrDefault(t => t.Organization_ID == organization && t.Date_ID == dateOfWeek);
+            if(organization == null) {
+                return NotFound();
+            } else if(dateOfWeek == null || fromDateToCheck == null || toDateToCheck == null) {
+                return BadRequest();
+            }
 
-        //     string tmpRequestDate = dateToCheck.ToString("H:mm");
-        //     string tmpDateBaseDateFrom = organizationScheduleAtDay.From.ToString("H:mm");
-        //     string tmpDateBaseDateTo = organizationScheduleAtDay.To.ToString("H:mm");
+            OrganizationDateRelation organizationScheduleAtDay = dbContext.OrganizationDateRelation
+                .FirstOrDefault(t => t.Organization_ID == organization && t.Date_ID == dateOfWeek);
 
-        //     bool result = DateTime.Parse(tmpRequestDate) > DateTime.Parse(tmpDateBaseDateFrom) && DateTime.Parse(tmpRequestDate) < DateTime.Parse(tmpDateBaseDateTo);
-        //     return Ok(result);
-        // }
+            TimeSpan fromTimeToCheck = TimeSpan.Parse(fromDateToCheck.ToString("HH:mm"));
+            TimeSpan toTimeToCheck = TimeSpan.Parse(toDateToCheck.ToString("HH:mm"));
+            Tuple<TimeSpan, TimeSpan> scheduleRange = new Tuple<TimeSpan, TimeSpan>((TimeSpan) organizationScheduleAtDay.From, (TimeSpan) organizationScheduleAtDay.To);
+            Tuple<TimeSpan, TimeSpan> requestRange = new Tuple<TimeSpan, TimeSpan>(fromTimeToCheck, toTimeToCheck);
+
+            return Ok(
+                !(scheduleRange.Item1 > scheduleRange.Item2 || requestRange.Item1 > requestRange.Item2) &&
+                (scheduleRange.Item1 <= requestRange.Item1 && requestRange.Item1 <= scheduleRange.Item2
+                && scheduleRange.Item1 <= requestRange.Item2 && requestRange.Item2 <= scheduleRange.Item2)
+            );
+        }
 
         [Authorize(Policy = "ApiUser")]
         [HttpPost("{id}/set-avatar")]
