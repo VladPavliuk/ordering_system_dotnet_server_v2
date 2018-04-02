@@ -125,6 +125,19 @@ namespace Reservation.Controllers
             .ToList();
         }
 
+        [HttpGet("{id}/orders")]
+        [Authorize(Policy = "ApiUser")]
+        public IActionResult getOrganizationOrders(int id)
+        {
+            Organization organization = dbContext.Organization.Where(t => t.ID == id).FirstOrDefault();
+
+            if(organization == null) {
+                return NotFound();
+            }
+
+            return Ok(dbContext.Order.Where(t => t.Organization_ID == organization).Include(t => t.Service_ID).ToList());
+        }
+
         [HttpGet("owner")]
         [Authorize(Policy = "ApiUser")]
         public async Task<IEnumerable<Organization>> GetAllWhereOwner()
@@ -228,11 +241,14 @@ namespace Reservation.Controllers
         }
 
         [HttpGet("{organization_id}/{service_id}/mark")]
-        public async Task<IActionResult> getAverageMark(int organization_id, int service_id)
+        public IActionResult getAverageMark(int organization_id, int service_id)
         {
             Organization organization = dbContext.Organization.Where(t => t.ID == organization_id).FirstOrDefault();
             Service service = dbContext.Service.Where(t => t.ID == service_id).FirstOrDefault();
-            List<Order> orders = dbContext.Order.Where(t => t.Organization_ID == organization && t.Service_ID == service).ToList();
+            List<Order> orders = dbContext.Order
+                .Include(t => t.Organization_ID)
+                .Include(t => t.Service_ID)
+                .Where(t => t.Organization_ID == organization && t.Service_ID == service).ToList();
 
             if(organization == null || service == null || orders == null) {
                 return BadRequest();
