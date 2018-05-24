@@ -39,8 +39,8 @@ namespace mvc_auth
             var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions));
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                // options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
-                options.UseSqlServer(@"Data Source=sql6004.site4now.net; Initial Catalog=DB_A359A7_test;User ID=DB_A359A7_test_admin;Password=qQ!12345")
+                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
+                // options.UseSqlServer(@"Data Source=sql6004.site4now.net; Initial Catalog=DB_A359A7_test;User ID=DB_A359A7_test_admin;Password=qQ!12345")
             );
 
             services.AddSingleton<IJwtFactory, JwtFactory>();
