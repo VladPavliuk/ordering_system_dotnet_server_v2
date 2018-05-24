@@ -1,15 +1,3 @@
-/home/vlad/MEGA/Projects/dotnet/mvc_auth/bin/Debug/netcoreapp2.0/mvc_auth.deps.json
-/home/vlad/MEGA/Projects/dotnet/mvc_auth/bin/Debug/netcoreapp2.0/mvc_auth.runtimeconfig.json
-/home/vlad/MEGA/Projects/dotnet/mvc_auth/bin/Debug/netcoreapp2.0/mvc_auth.runtimeconfig.dev.json
-/home/vlad/MEGA/Projects/dotnet/mvc_auth/bin/Debug/netcoreapp2.0/mvc_auth.dll
-/home/vlad/MEGA/Projects/dotnet/mvc_auth/bin/Debug/netcoreapp2.0/mvc_auth.pdb
-/home/vlad/MEGA/Projects/dotnet/mvc_auth/obj/Debug/netcoreapp2.0/mvc_auth.csproj.CoreCompileInputs.cache
-/home/vlad/MEGA/Projects/dotnet/mvc_auth/obj/Debug/netcoreapp2.0/UserSecretsAssemblyInfo.cs
-/home/vlad/MEGA/Projects/dotnet/mvc_auth/obj/Debug/netcoreapp2.0/mvc_auth.AssemblyInfoInputs.cache
-/home/vlad/MEGA/Projects/dotnet/mvc_auth/obj/Debug/netcoreapp2.0/mvc_auth.AssemblyInfo.cs
-/home/vlad/MEGA/Projects/dotnet/mvc_auth/obj/Debug/netcoreapp2.0/mvc_auth.dll
-/home/vlad/MEGA/Projects/dotnet/mvc_auth/obj/Debug/netcoreapp2.0/mvc_auth.pdb
-/home/vlad/MEGA/Projects/dotnet/mvc_auth/bin/Debug/netcoreapp2.0/app.db
 C:\Users\PartOfNetfully\Desktop\practic\server\bin\Debug\netcoreapp2.0\app.db
 C:\Users\PartOfNetfully\Desktop\practic\server\bin\Debug\netcoreapp2.0\mvc_auth.deps.json
 C:\Users\PartOfNetfully\Desktop\practic\server\bin\Debug\netcoreapp2.0\mvc_auth.runtimeconfig.json
