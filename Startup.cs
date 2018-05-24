@@ -164,8 +164,8 @@ namespace mvc_auth
         private async Task CreateRoles(IServiceProvider serviceProvider)
         {
             //adding custom roles
-            var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var UserManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+                var RoleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                var UserManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
             string[] roleNames = { "Admin" };
 
